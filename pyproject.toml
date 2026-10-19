@@ -1,0 +1,10 @@
+[project]
+name = "airfoil-noise"
+version = "0.1.0"
+description = "Airfoil self-noise prediction with polynomial regression (MMA3001 project)"
+requires-python = ">=3.10"
+
+[tool.pytest.ini_options]
+# Let the tests import airfoil_noise from src/ without installing it.
+pythonpath = ["src"]
+testpaths = ["tests"]
