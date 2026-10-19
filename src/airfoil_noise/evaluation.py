@@ -43,15 +43,6 @@ of acoustic energy, so a design could exceed a noise limit it appeared to
 meet (the "decision and cost" part of the prediction contract)."""
 
 
-# ---------------------------------------------------------------------------
-# Course link: Week 5.5 metrics
-#   residual e = y - y_hat (measured minus predicted)
-#   MAE  = mean(|e|)            typical error, in dB
-#   RMSE = sqrt(mean(e**2))     like MAE but punishes big misses more, in dB
-#   R2   = 1 - sum(e**2) / sum((y - mean(y))**2)
-#          1 = perfect, 0 = no better than predicting the mean,
-#          negative = worse than predicting the mean.
-# ---------------------------------------------------------------------------
 def underprediction_rate(y_true, y_pred) -> float:
     """Fraction of rows where noise is underpredicted by more than 3 dB.
 
@@ -65,7 +56,23 @@ def underprediction_rate(y_true, y_pred) -> float:
 
 
 def regression_metrics(y_true, y_pred) -> dict:
-    """RMSE, MAE, R2 and the >3 dB underprediction rate for one set of predictions."""
+    """RMSE, MAE, R2 and the >3 dB underprediction rate for one set of predictions.
+
+    Course link: Week 5.5 regression metrics. With residual
+    e = y - y_hat (measured minus predicted):
+
+    | Metric | Formula                              | Meaning                          |
+    |--------|--------------------------------------|----------------------------------|
+    | MAE    | mean(abs(e))                         | typical error, in dB             |
+    | RMSE   | sqrt(mean(e**2))                     | like MAE but punishes big misses more, in dB |
+    | R2     | 1 - sum(e**2) / sum((y - mean(y))**2) | 1 = perfect, 0 = no better than the mean, negative = worse than the mean |
+    | under3 | fraction of rows with e > 3 dB       | costly underpredictions          |
+
+    Returns
+    -------
+    dict
+        Keys `rmse`, `mae`, `r2`, `under3`.
+    """
     return {
         # Week 5.5 table: "square root of MSE" gives RMSE in target units.
         "rmse": float(np.sqrt(mean_squared_error(y_true, y_pred))),
