@@ -91,23 +91,26 @@ the runs have no timestamps and the task is not forecasting.
 
 ## Key results
 
-*Numbers are produced by `run_all.py`; see `results/` for full tables.*
+*Numbers are produced by `run_all.py` with the official UCI download (run in
+Google Colab); see `results/` for full tables.*
 
 | Model (final test, unseen runs) | RMSE (dB) | MAE (dB) | R² |
 |---|---|---|---|
-| Mean baseline | 6.01 | 4.96 | −0.04 |
-| Linear regression | 4.84 | 3.70 | 0.32 |
-| **Polynomial degree 2 (selected)** | **4.82** | **3.61** | **0.33** |
-| Polynomial degree 4 (random-split pick) | 10.66 | 5.66 | −2.29 |
+| Mean baseline | 7.15 | 5.68 | −0.05 |
+| Linear regression | 4.98 | 3.70 | 0.49 |
+| **Polynomial degree 2 (selected)** | **4.88** | **3.51** | **0.51** |
+| Polynomial degree 4 (random-split pick) | 834.5 | 314.1 | −14,338 |
 
-- The **random split would have chosen degree 4**, which then failed badly on
-  unseen runs. The grouped split chose degree 2.
+- The **random split would have chosen degree 4** (validation RMSE 3.16 dB),
+  which then failed completely on unseen runs. The grouped split chose
+  degree 2 (validation RMSE 4.19 dB vs 4.81 dB for linear).
 - Degrees 4–5 break down because velocity was only tested at 4 speeds, so
   high powers of velocity add no new information and the least-squares matrix
-  becomes nearly singular (condition number ~10¹⁶).
+  becomes nearly singular (condition number ~10¹⁷).
 - Without `StandardScaler`, even degree 2 has a condition number of ~10¹²
-  (about 40 with scaling).
-- The model predicts noise rising with velocity in 99% of matched cases.
+  (about 43 with scaling).
+- The model predicts noise rising with velocity in all 144 matched cases
+  (mean +3.9 dB predicted vs +3.3 dB measured, 31.7 → 71.3 m/s).
 
 ![Degree sweep](figures/degree_sweep.png)
 
@@ -126,6 +129,7 @@ Air-Foil-Noise/
 ├── figures/               # output figures (PNG)
 ├── docs/                  # HTML code documentation (pdoc)
 ├── reports/               # pytest HTML test report
+├── notebooks/             # Colab notebook that runs everything
 ├── AI_LOG.md              # record of AI use
 ├── requirements.txt
 ├── pyproject.toml
@@ -135,6 +139,11 @@ Air-Foil-Noise/
 ## How to run
 
 ### Google Colab
+
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/ellrohde/Air-Foil-Noise/blob/main/notebooks/airfoil_noise_colab.ipynb)
+
+Open `notebooks/airfoil_noise_colab.ipynb` and choose Runtime → Run all. It
+runs these steps:
 
 ```python
 !git clone https://github.com/ellrohde/Air-Foil-Noise.git
@@ -176,7 +185,10 @@ Runs in under a minute. A fixed random seed (42) makes results repeatable.
 - Only 4 velocities and 6 chords were tested, which limits how many polynomial
   terms the data can support.
 - The polynomial cannot reproduce the peaked shape of individual spectra;
-  typical error is ~4–5 dB on unseen runs.
+  typical error is ~5 dB on unseen runs.
+- The final test set is 22 of 106 runs, so its scores depend on which runs
+  were picked: an earlier run with a different row order gave R² 0.33 rather
+  than 0.51 for the same model.
 - Using log₁₀(frequency) as an input is a promising improvement (lower grouped
   error in early testing).
 
