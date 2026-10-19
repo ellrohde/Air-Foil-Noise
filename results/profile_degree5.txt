@@ -1,0 +1,23 @@
+         7820 function calls (7717 primitive calls) in 0.044 seconds
+
+   Ordered by: cumulative time
+   List reduced from 517 to 15 due to restriction <15>
+
+   ncalls  tottime  percall  cumtime  percall filename:lineno(function)
+      4/1    0.000    0.000    0.044    0.044 /usr/local/lib/python3.13/dist-packages/sklearn/base.py:1381(wrapper)
+        1    0.000    0.000    0.043    0.043 /usr/local/lib/python3.13/dist-packages/sklearn/pipeline.py:578(fit)
+        1    0.000    0.000    0.037    0.037 /usr/local/lib/python3.13/dist-packages/sklearn/linear_model/_base.py:653(fit)
+        1    0.000    0.000    0.035    0.035 /usr/local/lib/python3.13/dist-packages/scipy/linalg/_basic.py:1246(lstsq)
+        1    0.035    0.035    0.035    0.035 {built-in method scipy.linalg._batched_linalg._lstsq}
+        1    0.000    0.000    0.006    0.006 /usr/local/lib/python3.13/dist-packages/sklearn/pipeline.py:516(_fit)
+        2    0.000    0.000    0.005    0.003 /usr/local/lib/python3.13/dist-packages/joblib/memory.py:330(__call__)
+        2    0.000    0.000    0.005    0.003 /usr/local/lib/python3.13/dist-packages/sklearn/pipeline.py:1578(_fit_transform_one_with_callbacks)
+        2    0.000    0.000    0.005    0.003 /usr/local/lib/python3.13/dist-packages/sklearn/pipeline.py:1553(_fit_transform_one)
+      4/2    0.000    0.000    0.005    0.003 /usr/local/lib/python3.13/dist-packages/sklearn/utils/_set_output.py:325(wrapped)
+        2    0.000    0.000    0.005    0.003 /usr/local/lib/python3.13/dist-packages/sklearn/base.py:913(fit_transform)
+        5    0.000    0.000    0.004    0.001 /usr/local/lib/python3.13/dist-packages/sklearn/utils/validation.py:2932(validate_data)
+        8    0.000    0.000    0.004    0.000 /usr/local/lib/python3.13/dist-packages/sklearn/utils/validation.py:733(check_array)
+        1    0.000    0.000    0.002    0.002 /usr/local/lib/python3.13/dist-packages/sklearn/preprocessing/_data.py:903(fit)
+        1    0.000    0.000    0.002    0.002 /usr/local/lib/python3.13/dist-packages/sklearn/preprocessing/_data.py:930(partial_fit)
+
+
