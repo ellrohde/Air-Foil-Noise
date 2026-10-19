@@ -10,7 +10,7 @@
   "distinct_aoa": 27,
   "distinct_chords": 6,
   "distinct_velocities": 4,
-  "dev_rows": 1192,
+  "dev_rows": 1186,
   "dev_runs": 84,
-  "test_rows": 311
+  "test_rows": 317
 }
