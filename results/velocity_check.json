@@ -1,0 +1,18 @@
+{
+  "linear": {
+    "pairs": 174,
+    "model_increase_fraction": 1.0,
+    "measured_increase_fraction": 0.8045977011494253,
+    "mean_measured_increase_db": 3.9968390804597695,
+    "mean_predicted_increase_db": 4.490371065145161,
+    "u5_law_increase_db": 17.6015133817057
+  },
+  "poly2": {
+    "pairs": 174,
+    "model_increase_fraction": 0.9942528735632183,
+    "measured_increase_fraction": 0.8045977011494253,
+    "mean_measured_increase_db": 3.9968390804597695,
+    "mean_predicted_increase_db": 4.42954135631033,
+    "u5_law_increase_db": 17.6015133817057
+  }
+}

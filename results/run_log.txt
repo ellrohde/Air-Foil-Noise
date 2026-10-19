@@ -1,0 +1,43 @@
+Audit: {'rows': 1503, 'missing_values': 0, 'duplicate_rows': 0, 'non_positive_physical_values': 0, 'test_runs': 106, 'rows_per_run_min': 8, 'rows_per_run_max': 19, 'distinct_frequencies': 21, 'distinct_aoa': 27, 'distinct_chords': 6, 'distinct_velocities': 4}
+   degree    split  n_terms  train_rmse  val_rmse  val_rmse_std   val_r2  val_mae  val_under3  overfit_gap  fit_ms  predict_ms  est_mflops  design_matrix_kb
+0       1   random        5       4.808     4.836         0.157    0.533    3.763       0.258        0.028   2.578       0.901       0.060            46.562
+1       1  grouped        5       4.799     4.901         0.458    0.522    3.825       0.254        0.102   2.578       0.901       0.060            46.562
+2       2   random       20       4.018     4.170         0.265    0.653    3.209       0.239        0.152   3.096       1.044       0.962           186.250
+3       2  grouped       20       4.010     4.248         0.372    0.639    3.268       0.237        0.238   3.096       1.044       0.962           186.250
+4       3   random       55       3.277     3.685         0.574    0.728    2.735       0.185        0.409   5.261       1.274       7.378           512.188
+5       3  grouped       55       3.269     4.985         1.383    0.496    3.476       0.231        1.717   5.261       1.274       7.378           512.188
+6       4   random      125       2.438     3.330         1.173    0.769    2.249       0.116        0.892  14.505       1.454      39.203          1164.062
+7       4  grouped      125       2.447    46.730        31.582  -59.206   21.692       0.244       44.283  14.505       1.454      39.203          1164.062
+8       5   random      251       1.989     3.899         2.312    0.645    2.153       0.081        1.910  23.812       1.957     166.008          2337.438
+9       5  grouped      251       2.002    78.457        43.848 -148.004   28.444       0.357       76.455  23.812       1.957     166.008          2337.438
+Selected degree (grouped CV, 5% rule): 2; random split alone would pick: 4
+                                     model    rmse    mae     r2  under3
+0                            Mean baseline   6.009  4.962 -0.045   0.415
+1                        Linear regression   4.843  3.704  0.321   0.293
+2           Polynomial degree 2 (selected)   4.816  3.612  0.329   0.299
+3  Polynomial degree 4 (random-split pick)  10.659  5.655 -2.288   0.129
+Velocity check: {
+  "linear": {
+    "pairs": 174,
+    "model_increase_fraction": 1.0,
+    "measured_increase_fraction": 0.8045977011494253,
+    "mean_measured_increase_db": 3.9968390804597695,
+    "mean_predicted_increase_db": 4.490371065145161,
+    "u5_law_increase_db": 17.6015133817057
+  },
+  "poly2": {
+    "pairs": 174,
+    "model_increase_fraction": 0.9942528735632183,
+    "measured_increase_fraction": 0.8045977011494253,
+    "mean_measured_increase_db": 3.9968390804597695,
+    "mean_predicted_increase_db": 4.42954135631033,
+    "u5_law_increase_db": 17.6015133817057
+  }
+}
+   degree  kappa_scaled  kappa_unscaled
+0       1  3.568791e+00    5.004625e+05
+1       2  4.015573e+01    7.621662e+11
+2       3  1.929224e+03    4.760656e+18
+3       4  1.555376e+16    4.543203e+30
+4       5  1.786363e+18    5.750857e+42
+Done. Results in /home/claude/airfoil-noise/results, figures in /home/claude/airfoil-noise/figures
