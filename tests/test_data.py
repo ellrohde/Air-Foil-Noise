@@ -58,6 +58,18 @@ def test_audit_finds_missing_and_duplicate_rows(toy_runs):
     assert info["duplicate_rows"] == 1
 
 
+# --- Input ranges (Week 5.6 coverage) ----------------------------------------
+def test_input_ranges_match_the_data(toy_runs):
+    """Min, max and distinct counts must match a direct check of the data."""
+    from airfoil_noise.data import input_ranges
+    r = input_ranges(toy_runs).set_index("column")
+    assert list(r.index) == FEATURES + [TARGET]
+    assert r.loc["velocity", "min"] == 31.7
+    assert r.loc["velocity", "max"] == 71.3
+    assert r.loc["velocity", "distinct_values"] == 4   # 31.7, 39.6, 55.5, 71.3
+    assert r.loc["spl", "role"] == "target"
+
+
 # --- Run grouping (Week 5.6 grouped split) -----------------------------------
 def test_same_run_gets_same_id(toy_runs):
     """All five frequency bands of one run must share one run id."""

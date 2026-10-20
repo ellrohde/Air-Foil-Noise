@@ -112,18 +112,34 @@ def load_airfoil(cache_path: str | Path | None = DEFAULT_CACHE) -> pd.DataFrame:
     return df
 
 
+UCI_NAMES = {
+    "frequency": "frequency",
+    "attack-angle": "aoa",
+    "chord-length": "chord",
+    "free-stream-velocity": "velocity",
+    "suction-side-displacement-thickness": "thickness",
+    "scaled-sound-pressure": "spl",
+}
+"""UCI column name -> short name used in this project."""
+
+
 def _standardise_columns(df: pd.DataFrame) -> pd.DataFrame:
     """Rename the six UCI columns to the short names in `FEATURES + [TARGET]`.
 
-    UCI lists the columns in a fixed order (frequency, angle, chord, velocity,
-    thickness, SPL), so renaming by position is robust to small changes in the
-    published column names.
+    If the columns carry the UCI names they are renamed by name (safest).
+    If they already carry the short names they are kept. Otherwise they are
+    renamed by position, in the UCI order (frequency, angle, chord,
+    velocity, thickness, SPL).
     """
     if df.shape[1] != 6:
         raise ValueError(f"Expected 6 columns, got {df.shape[1]}")
     out = df.copy()  # copy so the caller's DataFrame is never changed
-    out.columns = FEATURES + [TARGET]
-    return out.astype(float)
+    if set(out.columns) == set(UCI_NAMES):
+        out = out.rename(columns=UCI_NAMES)
+    elif set(out.columns) != set(FEATURES + [TARGET]):
+        out.columns = FEATURES + [TARGET]
+    # Same column order every time, whatever order the file used.
+    return out[FEATURES + [TARGET]].astype(float)
 
 
 def audit(df: pd.DataFrame) -> dict:
@@ -159,6 +175,50 @@ def audit(df: pd.DataFrame) -> dict:
         "distinct_chords": int(df["chord"].nunique()),
         "distinct_velocities": int(df["velocity"].nunique()),
     }
+
+
+LONG_NAMES = {
+    "frequency": "Frequency",
+    "aoa": "Angle of attack",
+    "chord": "Chord length",
+    "velocity": "Free-stream velocity",
+    "thickness": "Suction-side displacement thickness",
+    "spl": "Scaled sound pressure level",
+}
+"""Full names of each column, for tables in the report."""
+
+
+def input_ranges(df: pd.DataFrame) -> pd.DataFrame:
+    """Table of the range covered by each input (and the target) in the data.
+
+    Course link: Week 5.6 "coverage" (which operating conditions the data
+    represents). The min and max define the measured domain: inside it the
+    model interpolates, outside it the model extrapolates (Week 3). The number
+    of distinct values shows how finely each input was sampled; for example,
+    velocity was tested at only 4 speeds, which limits how many powers of
+    velocity a polynomial can support.
+
+    Returns
+    -------
+    pandas.DataFrame
+        One row per variable with columns `variable`, `column`, `role`
+        (input or target), `unit`, `min`, `max`, `mean` and `distinct_values`.
+    """
+    rows = []
+    for col in FEATURES + [TARGET]:
+        s = df[col]
+        rows.append({
+            "variable": LONG_NAMES[col],
+            "column": col,
+            "role": "target" if col == TARGET else "input",
+            "unit": UNITS[col],
+            "min": s.min(),
+            "max": s.max(),
+            "mean": s.mean(),
+            # nunique() counts how many different values appear.
+            "distinct_values": int(s.nunique()),
+        })
+    return pd.DataFrame(rows)
 
 
 def make_run_groups(df: pd.DataFrame) -> pd.Series:

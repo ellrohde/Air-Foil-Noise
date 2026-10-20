@@ -39,7 +39,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent / "src"))
 
 from airfoil_noise import plots  # noqa: E402
 from airfoil_noise.data import (  # noqa: E402
-    FEATURES, TARGET, audit, load_airfoil, make_run_groups,
+    FEATURES, TARGET, audit, input_ranges, load_airfoil, make_run_groups,
 )
 from airfoil_noise.evaluation import (  # noqa: E402
     degree_sweep,
@@ -67,13 +67,16 @@ def main() -> None:
     df["run_id"] = make_run_groups(df)
     info = audit(df)
     print("Audit:", info)
+    ranges = input_ranges(df)
+    ranges.to_csv(RESULTS / "input_ranges.csv", index=False)
+    print(ranges.to_string(index=False))
 
     # 2. Final test set: whole runs, set aside before any modelling ----------
     dev_idx, test_idx = hold_out_test_runs(df, df["run_id"], 0.2, SEED)
     dev, test = df.iloc[dev_idx], df.iloc[test_idx]
     assert not set(dev["run_id"]) & set(test["run_id"]), "run leaked into test set"
     info.update(dev_rows=len(dev), dev_runs=dev["run_id"].nunique(),
-                test_rows=len(test), test_runs=test["run_id"].nunique())
+                holdout_rows=len(test), holdout_runs=test["run_id"].nunique())
     (RESULTS / "audit.json").write_text(json.dumps(info, indent=2))
 
     Xd, yd, gd = dev[FEATURES], dev[TARGET], dev["run_id"]
@@ -162,7 +165,91 @@ def main() -> None:
                               "Linear": test_preds["Linear regression"]},
                        example_runs, FIGURES / "example_spectra.png")
     plots.importance_plot(imp, FIGURES / "permutation_importance.png")
+
+    write_summary(info, ranges, sweep, chosen, random_choice, final,
+                  checks[f"poly{chosen}"], imp, cond)
     print(f"Done. Results in {RESULTS}, figures in {FIGURES}")
+
+
+def write_summary(info, ranges, sweep, chosen, random_choice, final, vcheck, imp,
+                  cond) -> None:
+    """Write results/summary.md: the headline numbers in one readable page.
+
+    Regenerated on every run, so the numbers always match the latest data.
+    """
+    g = sweep[sweep["split"] == "grouped"].set_index("degree")
+    r = sweep[sweep["split"] == "random"].set_index("degree")
+    lines = [
+        "# Results summary",
+        "",
+        "Generated automatically by `run_all.py`. Do not edit by hand.",
+        "",
+        "## Data",
+        f"- {info['rows']} rows from {info['test_runs']} wind-tunnel test runs "
+        f"({info['missing_values']} missing values, {info['duplicate_rows']} duplicate rows).",
+        f"- Development set: {info['dev_rows']} rows / {info['dev_runs']} runs. "
+        f"Final test set: {info['holdout_rows']} rows / {info['holdout_runs']} runs (whole runs held out).",
+        "",
+        "## Inputs and target: range in the data",
+        "",
+        "| Variable | Role | Unit | Min | Max | Distinct values |",
+        "|---|---|---|---|---|---|",
+    ]
+    for _, row in ranges.iterrows():
+        lines.append(f"| {row['variable']} | {row['role']} | {row['unit']} | "
+                     f"{row['min']:,.6g} | {row['max']:,.6g} | {row['distinct_values']} |")
+    lines += [
+        "",
+        "## Degree sweep (5-fold cross-validation on the development runs)",
+        "",
+        "| Degree | Terms | Train RMSE (dB) | Random-split RMSE (dB) | Grouped-split RMSE (dB) | Grouped R² | Fit time (ms) |",
+        "|---|---|---|---|---|---|---|",
+    ]
+    for d in g.index:
+        lines.append(
+            f"| {d} | {g.loc[d, 'n_terms']} | {g.loc[d, 'train_rmse']:.2f} | "
+            f"{r.loc[d, 'val_rmse']:.2f} | {g.loc[d, 'val_rmse']:.2f} | "
+            f"{g.loc[d, 'val_r2']:.2f} | {g.loc[d, 'fit_ms']:.1f} |")
+    lines += [
+        "",
+        f"- **Selected degree (grouped split, simplest within 5% of best): {chosen}**",
+        f"- A random row split alone would have selected degree {random_choice}.",
+        "",
+        "## Final test (held-out runs, used once)",
+        "",
+        "| Model | RMSE (dB) | MAE (dB) | R² | Underpredicted by >3 dB |",
+        "|---|---|---|---|---|",
+    ]
+    for _, row in final.iterrows():
+        lines.append(f"| {row['model']} | {row['rmse']:.2f} | {row['mae']:.2f} | "
+                     f"{row['r2']:.2f} | {100 * row['under3']:.0f}% |")
+    lines += [
+        "",
+        "## Physical check: noise vs velocity (31.7 → 71.3 m/s)",
+        f"- {vcheck['pairs']} matched pairs (same chord, angle and frequency).",
+        f"- Model predicts an increase in {100 * vcheck['model_increase_fraction']:.0f}% "
+        f"of pairs (measured: {100 * vcheck['measured_increase_fraction']:.0f}%).",
+        f"- Mean increase: predicted {vcheck['mean_predicted_increase_db']:+.1f} dB, "
+        f"measured {vcheck['mean_measured_increase_db']:+.1f} dB.",
+        "",
+        "## Sensitivity (permutation importance on the final test runs)",
+        "",
+        "| Input | RMSE increase when shuffled (dB) |",
+        "|---|---|",
+    ]
+    for _, row in imp.sort_values("rmse_increase_db", ascending=False).iterrows():
+        lines.append(f"| {row['feature']} | {row['rmse_increase_db']:.2f} |")
+    lines += [
+        "",
+        "## Numerical stability (condition number of the design matrix)",
+        "",
+        "| Degree | With StandardScaler | Without scaling |",
+        "|---|---|---|",
+    ]
+    for _, row in cond.iterrows():
+        lines.append(f"| {int(row['degree'])} | {row['kappa_scaled']:.1e} | "
+                     f"{row['kappa_unscaled']:.1e} |")
+    (RESULTS / "summary.md").write_text("\n".join(lines) + "\n", encoding="utf-8")
 
 
 if __name__ == "__main__":
