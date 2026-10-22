@@ -57,13 +57,20 @@ def _save(fig, path: Path) -> Path:
     return path
 
 
-def degree_sweep_plot(sweep: pd.DataFrame, selected: int, path: Path) -> Path:
+def degree_sweep_plot(sweep: pd.DataFrame, selected: int, path: Path,
+                      baseline_rmse: float | None = None) -> Path:
     """Validation RMSE vs polynomial degree for random and grouped splits.
 
     Log y-axis, because grouped errors at degree 4-5 are ~10x larger than the
-    rest. Training RMSE (dashed) shows the overfitting gap opening up.
+    rest. Training RMSE (dashed) shows the overfitting gap opening up. If
+    `baseline_rmse` is given, the mean baseline (DummyRegressor, grouped
+    split) is drawn as a horizontal reference line: points above it are
+    worse than predicting the average.
     """
     fig, ax = plt.subplots(figsize=(6, 3.6))
+    if baseline_rmse is not None:
+        ax.axhline(baseline_rmse, color=INK, lw=1, ls=":",
+                   label=f"Mean baseline, grouped ({baseline_rmse:.2f} dB)")
     for split, colour, label in [
         ("random", ORANGE, "Random row split (validation)"),
         ("grouped", BLUE, "Grouped split by test run (validation)"),
@@ -76,7 +83,7 @@ def degree_sweep_plot(sweep: pd.DataFrame, selected: int, path: Path) -> Path:
             label="Training error")
     sel = sweep[(sweep["split"] == "grouped") & (sweep["degree"] == selected)]
     ax.annotate(f"selected: degree {selected}", (selected, float(sel["val_rmse"].iloc[0])),
-                xytext=(10, 18), textcoords="offset points", color=INK,
+                xytext=(12, -28), textcoords="offset points", color=INK,
                 arrowprops={"arrowstyle": "-", "color": GREY})
     ax.set_yscale("log")
     ax.set_xticks(sweep["degree"].unique())
