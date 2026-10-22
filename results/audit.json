@@ -3,7 +3,7 @@
   "missing_values": 0,
   "duplicate_rows": 0,
   "non_positive_physical_values": 0,
-  "test_runs": 22,
+  "test_runs": 106,
   "rows_per_run_min": 8,
   "rows_per_run_max": 19,
   "distinct_frequencies": 21,
@@ -12,5 +12,6 @@
   "distinct_velocities": 4,
   "dev_rows": 1186,
   "dev_runs": 84,
-  "test_rows": 317
+  "holdout_rows": 317,
+  "holdout_runs": 22
 }
