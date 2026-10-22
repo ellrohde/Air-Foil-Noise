@@ -1,0 +1,7 @@
+variable,column,role,unit,min,max,mean,distinct_values
+Frequency,frequency,input,Hz,200.0,20000.0,2886.3805721889553,21
+Angle of attack,aoa,input,deg,0.0,22.2,6.782302062541583,27
+Chord length,chord,input,m,0.0254,0.3048,0.13654823685961412,6
+Free-stream velocity,velocity,input,m/s,31.7,71.3,50.86074517631405,4
+Suction-side displacement thickness,thickness,input,m,0.000400682,0.0584113,0.011139880391217565,105
+Scaled sound pressure level,spl,target,dB,103.38,140.987,124.83594278110448,1456

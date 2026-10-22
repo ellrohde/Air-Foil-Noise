@@ -1,23 +1,23 @@
-         6735 function calls (6605 primitive calls) in 0.147 seconds
+         6735 function calls (6605 primitive calls) in 1.006 seconds
 
    Ordered by: cumulative time
    List reduced from 392 to 15 due to restriction <15>
 
    ncalls  tottime  percall  cumtime  percall filename:lineno(function)
-      4/1    0.001    0.000    0.147    0.147 /usr/local/lib/python3.13/dist-packages/sklearn/base.py:1372(wrapper)
-        1    0.000    0.000    0.146    0.146 /usr/local/lib/python3.13/dist-packages/sklearn/pipeline.py:603(fit)
-        1    0.000    0.000    0.132    0.132 /usr/local/lib/python3.13/dist-packages/sklearn/linear_model/_base.py:573(fit)
-        1    0.000    0.000    0.126    0.126 /usr/local/lib/python3.13/dist-packages/scipy/_lib/_util.py:1203(wrapper)
-        1    0.125    0.125    0.125    0.125 /usr/local/lib/python3.13/dist-packages/scipy/linalg/_basic.py:1325(lstsq)
-        1    0.000    0.000    0.014    0.014 /usr/local/lib/python3.13/dist-packages/sklearn/pipeline.py:553(_fit)
-        2    0.000    0.000    0.013    0.007 /usr/local/lib/python3.13/dist-packages/joblib/memory.py:330(__call__)
-        2    0.000    0.000    0.013    0.007 /usr/local/lib/python3.13/dist-packages/sklearn/pipeline.py:1538(_fit_transform_one)
-      4/2    0.000    0.000    0.013    0.007 /usr/local/lib/python3.13/dist-packages/sklearn/utils/_set_output.py:317(wrapped)
-        2    0.000    0.000    0.013    0.007 /usr/local/lib/python3.13/dist-packages/sklearn/base.py:863(fit_transform)
-        8    0.001    0.000    0.011    0.001 /usr/local/lib/python3.13/dist-packages/sklearn/utils/validation.py:736(check_array)
-        5    0.000    0.000    0.009    0.002 /usr/local/lib/python3.13/dist-packages/sklearn/utils/validation.py:2835(validate_data)
-        1    0.000    0.000    0.005    0.005 /usr/local/lib/python3.13/dist-packages/sklearn/preprocessing/_data.py:869(fit)
-        1    0.000    0.000    0.004    0.004 /usr/local/lib/python3.13/dist-packages/sklearn/preprocessing/_data.py:896(partial_fit)
-        1    0.000    0.000    0.004    0.004 /usr/local/lib/python3.13/dist-packages/sklearn/linear_model/_base.py:107(_preprocess_data)
+      4/1    0.000    0.000    1.006    1.006 /usr/local/lib/python3.13/dist-packages/sklearn/base.py:1372(wrapper)
+        1    0.000    0.000    1.006    1.006 /usr/local/lib/python3.13/dist-packages/sklearn/pipeline.py:603(fit)
+        1    0.000    0.000    0.986    0.986 /usr/local/lib/python3.13/dist-packages/sklearn/linear_model/_base.py:573(fit)
+        1    0.000    0.000    0.981    0.981 /usr/local/lib/python3.13/dist-packages/scipy/_lib/_util.py:1203(wrapper)
+        1    0.980    0.980    0.981    0.981 /usr/local/lib/python3.13/dist-packages/scipy/linalg/_basic.py:1325(lstsq)
+        1    0.000    0.000    0.019    0.019 /usr/local/lib/python3.13/dist-packages/sklearn/pipeline.py:553(_fit)
+        2    0.000    0.000    0.019    0.009 /usr/local/lib/python3.13/dist-packages/joblib/memory.py:330(__call__)
+        2    0.000    0.000    0.019    0.009 /usr/local/lib/python3.13/dist-packages/sklearn/pipeline.py:1538(_fit_transform_one)
+      4/2    0.000    0.000    0.018    0.009 /usr/local/lib/python3.13/dist-packages/sklearn/utils/_set_output.py:317(wrapped)
+        2    0.000    0.000    0.018    0.009 /usr/local/lib/python3.13/dist-packages/sklearn/base.py:863(fit_transform)
+        5    0.000    0.000    0.014    0.003 /usr/local/lib/python3.13/dist-packages/sklearn/utils/validation.py:2835(validate_data)
+        8    0.000    0.000    0.014    0.002 /usr/local/lib/python3.13/dist-packages/sklearn/utils/validation.py:736(check_array)
+        1    0.000    0.000    0.010    0.010 /usr/local/lib/python3.13/dist-packages/sklearn/preprocessing/_data.py:869(fit)
+        1    0.000    0.000    0.010    0.010 /usr/local/lib/python3.13/dist-packages/sklearn/preprocessing/_data.py:896(partial_fit)
+       16    0.000    0.000    0.007    0.000 /usr/local/lib/python3.13/dist-packages/pandas/core/generic.py:6432(dtypes)
 
 
