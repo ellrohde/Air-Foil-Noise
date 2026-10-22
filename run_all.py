@@ -42,7 +42,10 @@ from airfoil_noise.data import (  # noqa: E402
     FEATURES, TARGET, audit, input_ranges, load_airfoil, make_run_groups,
 )
 from airfoil_noise.evaluation import (  # noqa: E402
+    cross_validate_model,
     degree_sweep,
+    grouped_splitter,
+    random_splitter,
     hold_out_test_runs,
     out_of_fold_predictions,
     regression_metrics,
@@ -91,6 +94,23 @@ def main() -> None:
     print(sweep.round(3).to_string())
     print(f"Selected degree (grouped CV, 5% rule): {chosen}; "
           f"random split alone would pick: {random_choice}")
+
+    # 4b. Mean baseline in cross-validation (Week 5.5 DummyRegressor) --------
+    # Predicts the training-fold mean SPL for every row, ignoring all inputs.
+    # Scored with the same folds as the sweep, so it is a fair reference line:
+    # any model that cannot beat it has learned nothing useful.
+    baseline_rows = []
+    for split_name, splitter in [("random", random_splitter(5, SEED)),
+                                 ("grouped", grouped_splitter(5))]:
+        cv = cross_validate_model(make_mean_baseline(), Xd, yd, splitter, gd)
+        baseline_rows.append({"model": "Mean baseline", "split": split_name,
+                              "val_rmse": cv["val_rmse"].mean(),
+                              "val_rmse_std": cv["val_rmse"].std(),
+                              "val_mae": cv["val_mae"].mean(),
+                              "val_r2": cv["val_r2"].mean()})
+    baseline_cv = pd.DataFrame(baseline_rows)
+    baseline_cv.to_csv(RESULTS / "baseline_cv.csv", index=False)
+    print(baseline_cv.round(3).to_string(index=False))
 
     # 5. Final test, used once ------------------------------------------------
     candidates = {
@@ -152,7 +172,10 @@ def main() -> None:
     (RESULTS / "profile_degree5.txt").write_text(buf.getvalue())
 
     # Figures ------------------------------------------------------------------
-    plots.degree_sweep_plot(sweep, chosen, FIGURES / "degree_sweep.png")
+    grouped_baseline = float(
+        baseline_cv.loc[baseline_cv["split"] == "grouped", "val_rmse"].iloc[0])
+    plots.degree_sweep_plot(sweep, chosen, FIGURES / "degree_sweep.png",
+                            baseline_rmse=grouped_baseline)
     plots.runtime_plot(sweep, FIGURES / "runtime.png")
     plots.observed_vs_predicted_plot(
         yt, {k: v for k, v in test_preds.items() if k != "Mean baseline"},
@@ -167,12 +190,12 @@ def main() -> None:
     plots.importance_plot(imp, FIGURES / "permutation_importance.png")
 
     write_summary(info, ranges, sweep, chosen, random_choice, final,
-                  checks[f"poly{chosen}"], imp, cond)
+                  checks[f"poly{chosen}"], imp, cond, baseline_cv)
     print(f"Done. Results in {RESULTS}, figures in {FIGURES}")
 
 
 def write_summary(info, ranges, sweep, chosen, random_choice, final, vcheck, imp,
-                  cond) -> None:
+                  cond, baseline_cv) -> None:
     """Write results/summary.md: the headline numbers in one readable page.
 
     Regenerated on every run, so the numbers always match the latest data.
@@ -205,6 +228,11 @@ def write_summary(info, ranges, sweep, chosen, random_choice, final, vcheck, imp
         "| Degree | Terms | Train RMSE (dB) | Random-split RMSE (dB) | Grouped-split RMSE (dB) | Grouped R² | Fit time (ms) |",
         "|---|---|---|---|---|---|---|",
     ]
+    # Initial reference model first: the mean baseline (DummyRegressor).
+    b = baseline_cv.set_index("split")
+    lines.append(
+        f"| Mean baseline (DummyRegressor) | 0 | – | {b.loc['random', 'val_rmse']:.2f} | "
+        f"{b.loc['grouped', 'val_rmse']:.2f} | {b.loc['grouped', 'val_r2']:.2f} | – |")
     for d in g.index:
         lines.append(
             f"| {d} | {g.loc[d, 'n_terms']} | {g.loc[d, 'train_rmse']:.2f} | "
